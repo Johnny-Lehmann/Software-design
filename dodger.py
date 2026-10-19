@@ -16,6 +16,7 @@ PLAYERMOVERATE = 5
 # test 333
 # test 444
 # test 555
+# test 666 mr
 
 
 def terminate():
