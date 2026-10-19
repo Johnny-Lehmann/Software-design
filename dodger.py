@@ -14,7 +14,7 @@ ADDNEWBADDIERATE = 6 #nb d'ennemis par loop
 PLAYERMOVERATE = 5 
 
 # test 333
-
+# test 444
 
 
 
