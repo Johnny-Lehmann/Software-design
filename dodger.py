@@ -17,7 +17,7 @@ PLAYERMOVERATE = 5
 # test 444
 # test 555
 # test 666 mr
-
+# johnny is the best
 
 def terminate():
     pygame.quit()
