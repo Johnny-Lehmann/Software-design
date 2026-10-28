@@ -16,6 +16,7 @@ BADDIEMINSPEED = 1
 BADDIEMAXSPEED = 8
 ADDNEWBADDIERATE = 6 #nb of enemies per loop
 PLAYERMOVERATE = 5
+LEVELS = [level1_spring, level2_summer, level3_autumn, level4_winter] # List of the 4 seasons in playing order
 
 
 
@@ -77,9 +78,12 @@ while True:
     baddies = []
     score = 0
     nb_loop = 0 # counter for the number of loops
-    currentLevel = level1_spring # the season being played
+    levelIndex = 0 # number of the season being played (0 = spring, 1 = summer, ...)
+    currentLevel = LEVELS[levelIndex] # the season being played    
+    backgroundImage = pygame.transform.scale(pygame.image.load(currentLevel.BACKGROUNDIMAGE), (WINDOWWIDTH, WINDOWHEIGHT)) # load the background of the season and resize it to the window
     playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)
     moveLeft = moveRight = moveUp = moveDown = False
+    hasWon = False # becomes True when the 4 seasons are done
     reverseCheat = slowCheat = False
     baddieAddCounter = 0
     pygame.mixer.music.play(-1, 0.0)
@@ -170,7 +174,7 @@ while True:
                 baddies.remove(b)
 
         # Draw the game world on the window.
-        windowSurface.fill(currentLevel.BACKGROUNDCOLOR)
+        windowSurface.blit(backgroundImage, (0, 0)) # draw the background picture
 
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
@@ -193,14 +197,33 @@ while True:
             break
         # Check if the season is over (time "DURATION" is up)
         if nb_loop >= currentLevel.DURATION * FPS:
-            break
+            levelIndex += 1 # go to the next season
+            if levelIndex == len(LEVELS): # no season left: the 4 seasons are done
+                if score > topScore:
+                    topScore = score # set new top score
+                hasWon = True # the farmer survived the 4 seasons so he won the game
+                break
+            currentLevel = LEVELS[levelIndex] # load the new season
+            backgroundImage = pygame.transform.scale(pygame.image.load(currentLevel.BACKGROUNDIMAGE), (WINDOWWIDTH, WINDOWHEIGHT)) # load the background of the new season
+            nb_loop = 0 # restart the timer for the new season
+            baddies = [] # remove the enemies of the previous season
+            # Show the name of the new season before it starts
+            windowSurface.fill(currentLevel.BACKGROUNDCOLOR)
+            drawText(currentLevel.SEASON, font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
+            drawText('Press a key to continue.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 3) + 50)
+            pygame.display.update()
+            waitForPlayerToPressKey()
+            moveLeft = moveRight = moveUp = moveDown = False # the farmer stands still at the start of the season
         mainClock.tick(FPS)
 
     # Stop the game and show the "Game Over" screen.
     pygame.mixer.music.stop()
     gameOverSound.play()
 
-    drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
+    if hasWon:
+        drawText('YOU WIN!', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
+    else:
+        drawText('GAME OVER', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
     drawText('Press a key to play again.', font, windowSurface, (WINDOWWIDTH / 3) - 80, (WINDOWHEIGHT / 3) + 50)
     pygame.display.update()
     waitForPlayerToPressKey()
