@@ -3,7 +3,7 @@ import pygame, random, sys
 import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from pygame.locals import *
-import level1_spring, level2_summer, level3_autumn, level4_winter
+import level1_spring, level2_summer, level3_autumn, level4_winter #call the seasons files
 
 WINDOWWIDTH = 1000
 WINDOWHEIGHT = 700
