@@ -1,8 +1,12 @@
 import pygame, random, sys
+# for macbook :
+import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from pygame.locals import *
+import level1_spring, level2_summer, level3_autumn, level4_winter
 
-WINDOWWIDTH = 600
-WINDOWHEIGHT = 600
+WINDOWWIDTH = 1000
+WINDOWHEIGHT = 700
 TEXTCOLOR = (0, 0, 0)
 BACKGROUNDCOLOR = (255, 255, 255)
 FPS = 60
@@ -10,14 +14,9 @@ BADDIEMINSIZE = 10 #ennemies
 BADDIEMAXSIZE = 40
 BADDIEMINSPEED = 1
 BADDIEMAXSPEED = 8
-ADDNEWBADDIERATE = 6 #nb d'ennemis par loop
-PLAYERMOVERATE = 5 
+ADDNEWBADDIERATE = 6 #nb of enemies per loop
+PLAYERMOVERATE = 5
 
-# test 333
-# test 444
-# test 555
-# test 666 mr
-# johnny is the best
 
 
 def terminate():
@@ -66,7 +65,7 @@ playerRect = playerImage.get_rect()
 baddieImage = pygame.image.load('baddie.png')
 
 # Show the "Start" screen.
-windowSurface.fill(BACKGROUNDCOLOR)
+windowSurface.fill(level1_spring.BACKGROUNDCOLOR)
 drawText('Dodger', font, windowSurface, (WINDOWWIDTH / 3), (WINDOWHEIGHT / 3))
 drawText('Press a key to start.', font, windowSurface, (WINDOWWIDTH / 3) - 30, (WINDOWHEIGHT / 3) + 50)
 pygame.display.update()
@@ -77,6 +76,8 @@ while True:
     # Set up the start of the game.
     baddies = []
     score = 0
+    nb_loop = 0 # counter for the number of loops
+    currentLevel = level1_spring # the season being played
     playerRect.topleft = (WINDOWWIDTH / 2, WINDOWHEIGHT - 50)
     moveLeft = moveRight = moveUp = moveDown = False
     reverseCheat = slowCheat = False
@@ -85,7 +86,7 @@ while True:
 
     while True: # The game loop runs while the game part is playing.
         score += 1 # Increase score.
-
+        nb_loop += 1 # Increase the loop counter
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate()
@@ -169,11 +170,12 @@ while True:
                 baddies.remove(b)
 
         # Draw the game world on the window.
-        windowSurface.fill(BACKGROUNDCOLOR)
+        windowSurface.fill(currentLevel.BACKGROUNDCOLOR)
 
         # Draw the score and top score.
         drawText('Score: %s' % (score), font, windowSurface, 10, 0)
         drawText('Top Score: %s' % (topScore), font, windowSurface, 10, 40)
+        drawText('Time: %s' % ((currentLevel.DURATION * FPS - nb_loop) // FPS), font, windowSurface, 10, 80)
 
         # Draw the player's rectangle.
         windowSurface.blit(playerImage, playerRect)
@@ -189,7 +191,9 @@ while True:
             if score > topScore:
                 topScore = score # set new top score
             break
-
+        # Check if the season is over (time "DURATION" is up)
+        if nb_loop >= currentLevel.DURATION * FPS:
+            break
         mainClock.tick(FPS)
 
     # Stop the game and show the "Game Over" screen.
